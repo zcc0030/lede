@@ -110,6 +110,28 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 5. 重新加载一下 shell 启动文件 `source ~/.bashrc`，然后输入 `bash` 进入 bash shell，就可以和 Linux 一样正常编译了
 
+## 如果使用arm架构的linux进行编译（例如在m1、m2系列的mac中使用ubuntu arm 虚拟机进行编译）
+如果用ubuntu arm 进行编译，上文的编译依赖中，有个三依赖无法安装，分别是gcc-multilib g++-multilib libc6-dev-i386，是因为这三个依赖在arm版和x86版的系统中不同名导致。
+所以安装依赖时，先把上文的编译依赖中的gcc-multilib g++-multilib libc6-dev-i386删除后再执行安装。然后再单独安装这三个依赖的arm版：
+   ```bash
+   #gcc-multilib
+   sudo apt install gcc-multilib-arm-linux-gnueabi gcc-multilib-arm-linux-gnueabihf gcc-multilib-i686-linux-gnu gcc-multilib-s390x-linux-gnu gcc-multilib-x86-64-linux-gnu gcc-multilib-x86-64-linux-gnux32
+   
+   #g++-multilib
+   sudo apt install g++-multilib-arm-linux-gnueabi g++-multilib-arm-linux-gnueabihf g++-multilib-i686-linux-gnu g++-multilib-s390x-linux-gnu g++-multilib-x86-64-linux-gnu g++-multilib-x86-64-linux-gnux32
+   
+   #libc6-dev-i386
+   sudo apt install libc6-dev-i386-amd64-cross libc6-dev-i386-cross libc6-dev-i386-x32-cross
+   ```
+所有依赖安装完毕后，还需要单独安装go
+   ```bash
+   sudo apt install golang-go
+   ```
+在make menuconfig之后，需要编辑lede目录下的.config文件，配置go环境：
+找到CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT=””这行，在双引号中填入/usr/bin/go
+
+之后正常编译就行了
+
 ## 特别提示
 
 1. 源代码中绝不含任何后门和可以监控或者劫持你的 HTTPS 的闭源软件， SSL 安全是互联网最后的壁垒。安全干净才是固件应该做到的；
